@@ -1,0 +1,26 @@
+install:
+    go mod tidy
+    go get -u github.com/gin-gonic/gin
+    go get -u gorm.io/gorm
+    go get -u gorm.io/driver/postgres
+    go get -u github.com/pressly/goose
+
+build:
+    go build -o myapp main.go
+
+run:
+    go run main.go
+
+lint:
+    golint ./...
+    gofmt -w .
+    goimports -w .
+
+test:
+    go test ./...
+
+migrate:
+    goose -dir migrations postgres "user=username password=password dbname=mydb port=5432 sslmode=disable" up
+
+clean:
+    go clean

@@ -1,17 +1,25 @@
-package main
+package database
 
 import (
+    "database/sql"
     "gorm.io/driver/postgres"
     "gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var dbURL = "postgres://postgres:aayush@localhost/myproject?sslmode=disable"
 
-func ConnectDatabase() {
-    var err error
-    dsn := "user=username password=password dbname=mydb port=5432 sslmode=disable"
-    DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-    if err != nil {
-        panic("failed to connect database")
+var GORM_DB *gorm.DB
+var SQL_DB *sql.DB
+var DB_MIGRATOR gorm.Migrator
+
+func ConnectToDatabase() (error) {
+    db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+    if err == nil {
+        GORM_DB = db
+        SQL_DB, _ = db.DB()
+        DB_MIGRATOR = db.Migrator()
     }
+    return err
 }
+
+
