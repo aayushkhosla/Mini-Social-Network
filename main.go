@@ -44,7 +44,7 @@ func main() {
 
 	r.POST("/auth/signup", controllers.SignUp)
 	r.POST("/auth/login", controllers.Login)
-	r.get("/user/Personaldetails" , middlewares.CheckAuth() , controllers.Getuser )
+	r.GET("/user/Personaldetails" , middlewares.CheckAuth() , controllers.Getuser )
 
 	fmt.Println("Hello")
 	r.Run()
