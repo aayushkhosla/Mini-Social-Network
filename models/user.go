@@ -1,8 +1,10 @@
 package models
 
 import (
-    "gorm.io/gorm"
-    "gorm.io/datatypes"
+	"time"
+
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
 )
 
 type Gender string
@@ -31,9 +33,9 @@ type User struct {
     DateOfBirth    datatypes.Date
     Gender         Gender
     MaritalStatus  MaritalStatus
-    CreatedAt      datatypes.Date
-    UpdatedAt      datatypes.Date
-    OfficeDetails  []OfficeDetail `gorm:"foreignKey:UserID"`
-    AddressDetails []AddressDetail `gorm:"foreignKey:UserID"`
+    OfficeDetail   []OfficeDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+    AddressDetail  []AddressDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+    CreatedAt      time.Time      
+    UpdatedAt      time.Time       
    
 }

@@ -69,6 +69,22 @@ func SignUp(c *gin.Context ){
 			DateOfBirth    time.Time
 			Gender         models.Gender
 			MaritalStatus  models.MaritalStatus
+			//office 
+			EmployeeCode  string         
+			OfficeAddress       string         
+			OfficeCity          string
+			OfficeState         string
+			OfficeCountry       string
+			OfficeContactNo     string
+			OfficeEmail   string
+			OfficeName    string
+			//personal 
+			Address      string         
+			City         string
+			State        string
+			Country      string
+			ContactNo1   string
+			ContactNo2   string
 		}
 		// if c.Bind(&input) != nil {
 		// 	c.JSON(http.StatusBadRequest,gin.H{
@@ -80,7 +96,7 @@ func SignUp(c *gin.Context ){
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-
+		fmt.Println(input)	
 		var userFound models.User
 
 		database.GORM_DB.First(&userFound , "email=?" ,input.Email).Find(&userFound)
@@ -98,19 +114,45 @@ func SignUp(c *gin.Context ){
 			Password :string(passwordHash),   
 			Username      :input.Username,
 			Email :input.Email  ,         
-			// FirstName    :input.FirstName,
-			// LastName       :input.LastName,
-			// DateOfBirth    :datatypes.Date(input.DateOfBirth),
-			// Gender       :input.Gender,
-			// MaritalStatus  :input.MaritalStatus,
-			FirstName    :"Aayush",
-			LastName       :"khosla",
-			DateOfBirth    : datatypes.Date(time.Now()),
+			FirstName    :input.FirstName,
+			LastName       :input.LastName,
+			DateOfBirth    :datatypes.Date(input.DateOfBirth),
+			Gender       :input.Gender,
+			MaritalStatus  :input.MaritalStatus,
+			// FirstName    :"Aayush",
+			// LastName       :"khosla",
+			// DateOfBirth    : datatypes.Date(time.Now()),
 		// 	"Gender":"male",
 		// 	"MaritalStatus":"married""),
-			Gender:"male",
-			MaritalStatus:"married",
+			// Gender:"male",
+			// MaritalStatus:"married",
 		}
+
+		office := models.OfficeDetail{
+			EmployeeCode :input.EmployeeCode,	
+			Address       :input.OfficeAddress,
+			City          :input.OfficeCity,
+			State         :input.OfficeState,
+			Country       :input.OfficeCountry,
+			ContactNo     :input.OfficeContactNo,
+			OfficeEmail   :input.OfficeEmail,
+			OfficeName  :input.OfficeName,
+		}
+
+		adderss := models.AddressDetail{
+			Address    :input.Address  ,
+			City         :input.City,
+			State        :input.State,
+			Country      :input.Country,
+			ContactNo1   :input.ContactNo1,
+			ContactNo2   :input.ContactNo2,
+		}
+		user.AddressDetail = append(user.AddressDetail , adderss)
+		user.OfficeDetail = append(user.OfficeDetail, office)
+
+		database.GORM_DB.Create(&office)
+		database.GORM_DB.Create(&adderss)
+
 		database.GORM_DB.Create(&user)
 		c.JSON(http.StatusOK, gin.H{"data":user})
 

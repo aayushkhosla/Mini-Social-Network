@@ -43,9 +43,11 @@ func main() {
 	 
 
 	r.POST("/auth/signup", controllers.SignUp)
-	r.POST("/auth/login", controllers.Login)
-	r.get("/user/Personaldetails" , middlewares.CheckAuth() , controllers.Getuser )
-
+	r.POST("/auth/login", controllers.Login)  
+	r.GET("/user/personaldetails" , middlewares.CheckAuth , controllers.Getuser )
+	r.GET("/user/getalluser" , middlewares.CheckAuth , controllers.Userlist )
+	r.GET("/user/follows/:id" , middlewares.CheckAuth , controllers.Follow )
+	
 	fmt.Println("Hello")
 	r.Run()
 

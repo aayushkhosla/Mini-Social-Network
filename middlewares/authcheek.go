@@ -69,6 +69,6 @@ func CheckAuth(c *gin.Context) {
 	}
 
 	c.Set("currentUser", user)
-
+	c.Set("currentUserid", user.ID)
 	c.Next()
 }
