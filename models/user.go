@@ -37,5 +37,6 @@ type User struct {
     AddressDetail  []AddressDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
     CreatedAt      time.Time      
     UpdatedAt      time.Time       
-   
+
+    
 }

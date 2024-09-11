@@ -28,28 +28,8 @@ func upCreateUser(ctx context.Context, tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Test ", db)
 	return db.Migrator().CreateTable(&models.User{})
 
-
-	// if err:=database.DB_MIGRATOR.CreateTable(&models.User{});err !=nil {
-	// 	return err
-	// }
-
-	
-	// if err :=  database.DB_MIGRATOR.CreateTable(&models.AddressDetail{}) ;err !=nil {
-	// 	return err
-	// }
-	
-	// if err :=  database.DB_MIGRATOR.CreateTable(&models.Follow{}) ;err !=nil {
-	// 	return err
-	// }
-	// if err :=  database.DB_MIGRATOR.CreateTable(&models.OfficeDetail{}) ;err !=nil {
-	// 	return err
-	// }
-	// return nil
-	//  database.DB_MIGRATOR.CreateTable(&models.Follow{})
-	//  database.DB_MIGRATOR.CreateTable(&models.OfficeDetail{})
 }
 
 func downCreateUser(ctx context.Context, tx *sql.Tx) error {

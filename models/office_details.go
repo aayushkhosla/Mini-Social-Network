@@ -15,6 +15,7 @@ type OfficeDetail struct {
     ContactNo     string
     OfficeEmail   string
     OfficeName    string
+    UserID  uint  `gorm:"index"`
 }
 
 

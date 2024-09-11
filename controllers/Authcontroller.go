@@ -8,84 +8,139 @@ import (
 
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/datatypes"
 
 	"github.com/gin-gonic/gin"
 )
-
-
-func Login(c *gin.Context) {
-
-	var logininput struct{
-		Email string
-		Password string
+var validate = validator.New()
+func UpdatePassword(c *gin.Context){
+	type input struct{
+		Old_password string `validate:"required"`
+		New_password string  `validate:"required"`
 	}
-
-	if err := c.Bind(&logininput); err != nil {
+	passwordchangeinput := input{}
+	if err := c.Bind(&passwordchangeinput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
 		return
 	}
 
-	var userFound models.User
-	fmt.Println(logininput)
-	database.GORM_DB.First(  &userFound , "email=?", logininput.Email ).Find(&userFound)
-
-	if userFound.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invaild email or password"})
+	if err := validate.Struct(passwordchangeinput); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		errorMessages := make(map[string]string)
+		for _, err := range validationErrors {
+			errorMessages[err.Field()] = fmt.Sprintf("The field %s is %s", err.Field(), err.Tag())
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errorMessages})
 		return
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(logininput.Password)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid email or  password"})
+	currentUser, exists := c.Get("currentUser")
+    if !exists {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+        return
+    } 
+		CurrentUser := currentUser.(models.User)
+	if err := bcrypt.CompareHashAndPassword([]byte(CurrentUser.Password), []byte(passwordchangeinput.Old_password)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid Old password"})
+		return
+	}
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(passwordchangeinput.New_password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	CurrentUser.Password = string(passwordHash)
+	if err:= database.GORM_DB.Save(&CurrentUser).Error ; err!=nil{
+		c.JSON(http.StatusInternalServerError ,gin.H{
+			"error":"Internal Server Error",
+		})
+		return
+	}
+	c.JSON(http.StatusOK ,gin.H{
+		"message" : "Operation successful",
+	} )
+
+}
+func Login(c *gin.Context) {
+	
+
+	var loginInput struct {
+		Email    string `validate:"required,email"`
+		Password string `validate:"required"`
+	}
+
+	if err := c.Bind(&loginInput); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read request body"})
+		return
+	}
+
+	if err := validate.Struct(loginInput); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		errorMessages := make(map[string]string)
+		for _, err := range validationErrors {
+			errorMessages[err.Field()] = fmt.Sprintf("The field %s is %s", err.Field(), err.Tag())
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errorMessages})
+		return
+	}
+
+	var userFound models.User
+	if err := database.GORM_DB.First(&userFound, "email = ?", loginInput.Email).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(loginInput.Password)); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password."})
 		return
 	}
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  userFound.ID,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"exp": time.Now().Add(time.Hour * 4).Unix(),
 	})
 
 	token, err := generateToken.SignedString([]byte(os.Getenv("SECRET")))
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to generate token"})
-	}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}	
 
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"token": token,
 	})
 }
 
-
 func SignUp(c *gin.Context ){
-		var input struct{
-			Password       string         
-			Username       string         
-			Email          string               
-			FirstName      string
-			LastName       string
-			DateOfBirth    time.Time
-			Gender         models.Gender
-			MaritalStatus  models.MaritalStatus
-			//office 
-			EmployeeCode  string         
-			OfficeAddress       string         
-			OfficeCity          string
-			OfficeState         string
-			OfficeCountry       string
-			OfficeContactNo     string
-			OfficeEmail   string
-			OfficeName    string
-			//personal 
-			Address      string         
-			City         string
-			State        string
-			Country      string
-			ContactNo1   string
-			ContactNo2   string
-		}
+			var input struct{
+				Password       string  `validate:"required"`       
+				Username       string     `validate:"required"`    
+				Email          string      `validate:"required,email"`
+				FirstName      string	`validate:"required"`
+				LastName       string `validate:"required"`
+				DateOfBirth    time.Time 
+				Gender         models.Gender `validate:"required"`
+				MaritalStatus  models.MaritalStatus `validate:"required"`
+				//office 
+				EmployeeCode  string         `validate:"required"`
+				OfficeAddress       string         `validate:"required"`
+				OfficeCity          string `validate:"required,max=50"`
+				OfficeState         string `validate:"required"`
+				OfficeCountry       string `validate:"required"`
+				OfficeContactNo     string `validate:"required"`
+				OfficeEmail   string   `validate:"required,email"`
+				OfficeName    string `validate:"required"`
+				//personal 
+				Address      string  `validate:"required,max=50"`
+				City         string  `validate:"required"`
+				State        string  `validate:"required"`
+				Country      string  `validate:"required"`
+				ContactNo1   string  `validate:"required"`
+				ContactNo2   string  `validate:"required"`
+			}
 		// if c.Bind(&input) != nil {
 		// 	c.JSON(http.StatusBadRequest,gin.H{
 		// 		"error": err,
@@ -96,7 +151,17 @@ func SignUp(c *gin.Context ){
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		fmt.Println(input)	
+	
+
+		if err := validate.Struct(input); err != nil {
+			validationErrors := err.(validator.ValidationErrors)
+			errorMessages := make(map[string]string)
+			for _, err := range validationErrors {
+				errorMessages[err.Field()] = fmt.Sprintf("The field %s is %s", err.Field(), err.Tag())
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"errors": errorMessages})
+			return
+		}
 		var userFound models.User
 
 		database.GORM_DB.First(&userFound , "email=?" ,input.Email).Find(&userFound)
@@ -118,14 +183,7 @@ func SignUp(c *gin.Context ){
 			LastName       :input.LastName,
 			DateOfBirth    :datatypes.Date(input.DateOfBirth),
 			Gender       :input.Gender,
-			MaritalStatus  :input.MaritalStatus,
-			// FirstName    :"Aayush",
-			// LastName       :"khosla",
-			// DateOfBirth    : datatypes.Date(time.Now()),
-		// 	"Gender":"male",
-		// 	"MaritalStatus":"married""),
-			// Gender:"male",
-			// MaritalStatus:"married",
+			MaritalStatus  :input.MaritalStatus,	
 		}
 
 		office := models.OfficeDetail{
@@ -157,4 +215,7 @@ func SignUp(c *gin.Context ){
 		c.JSON(http.StatusOK, gin.H{"data":user})
 
 }
+
+
+
 
