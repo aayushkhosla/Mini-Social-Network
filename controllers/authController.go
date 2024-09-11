@@ -116,12 +116,11 @@ func Login(c *gin.Context) {
 
 func SignUp(c *gin.Context ){
 			var input struct{
-				Password       string  `validate:"required"`       
-				Username       string     `validate:"required"`    
+				Password       string  `validate:"required"`        
 				Email          string      `validate:"required,email"`
 				FirstName      string	`validate:"required"`
 				LastName       string `validate:"required"`
-				DateOfBirth    time.Time 
+				DateOfBirth   datatypes.Date `validate:"required,date"`
 				Gender         models.Gender `validate:"required"`
 				MaritalStatus  models.MaritalStatus `validate:"required"`
 				//office 
@@ -152,7 +151,7 @@ func SignUp(c *gin.Context ){
 			return
 		}
 	
-
+	
 		if err := validate.Struct(input); err != nil {
 			validationErrors := err.(validator.ValidationErrors)
 			errorMessages := make(map[string]string)
@@ -177,7 +176,6 @@ func SignUp(c *gin.Context ){
 	
 		user := models.User{
 			Password :string(passwordHash),   
-			Username      :input.Username,
 			Email :input.Email  ,         
 			FirstName    :input.FirstName,
 			LastName       :input.LastName,

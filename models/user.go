@@ -25,7 +25,6 @@ type User struct {
     gorm.Model
     ID             uint           `gorm:"primaryKey"`
     Password       string         `gorm:"not null"`
-    Username       string         `gorm:"not null"`
     Email          string         `gorm:"unique;not null"`
     IsActive       bool           `gorm:"default:true"`
     FirstName      string
@@ -36,7 +35,8 @@ type User struct {
     OfficeDetail   []OfficeDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
     AddressDetail  []AddressDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
     CreatedAt      time.Time      
-    UpdatedAt      time.Time       
+    UpdatedAt      time.Time     
+    DeletedAt       time.Time 
 
     
 }

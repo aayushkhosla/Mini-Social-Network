@@ -1,5 +1,4 @@
 package main
-
 import (
 	"flag"
 	"fmt"
@@ -11,7 +10,6 @@ import (
 )
 var (
 	flags = flag.NewFlagSet("goose", flag.ExitOnError)
-	// dir   = flags.String("dir", ".", "directory with migration files")
 )
 func main() {
 	flags.Parse(os.Args[1:])
