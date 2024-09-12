@@ -36,7 +36,7 @@ func downCreateUser(ctx context.Context, tx *sql.Tx) error {
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		Conn: tx,
-	}), &gorm.Config{})
+	}), &gorm.Config{})	 
 	if err != nil {
 		return err
 	}

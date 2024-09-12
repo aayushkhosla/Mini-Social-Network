@@ -1,16 +1,20 @@
 package main
+
 import (
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
 	_ "github.com/aayushkhosla/Mini-Social-Network/migrations"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 )
+
 var (
 	flags = flag.NewFlagSet("goose", flag.ExitOnError)
 )
+
 func main() {
 	flags.Parse(os.Args[1:])
 	args := flags.Args()
@@ -39,7 +43,7 @@ func main() {
 		arguments = append(arguments, args[2:]...)
 	}
 
-	dir := "/home/ubuntu/Desktop/Projects/Mini_Social_Network/migrations"
+	dir := "/home/ubuntu/Desktop/Projects/miniSocialNetwork/migrations"
 	if err := goose.Run(command, db, dir, arguments...); err != nil {
 		log.Fatalf("goose %v: %v", command, err)
 	}

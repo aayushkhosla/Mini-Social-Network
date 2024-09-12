@@ -3,12 +3,11 @@ package models
 import (
 	"time"
 
-	"gorm.io/datatypes"
+	// "gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 type Gender string
-
 const (
     Male   Gender = "male"
     Female Gender = "female"
@@ -26,17 +25,11 @@ type User struct {
     ID             uint           `gorm:"primaryKey"`
     Password       string         `gorm:"not null"`
     Email          string         `gorm:"unique;not null"`
-    IsActive       bool           `gorm:"default:true"`
     FirstName      string
     LastName       string
-    DateOfBirth    datatypes.Date
+    DateOfBirth    time.Time   
     Gender         Gender
     MaritalStatus  MaritalStatus
-    OfficeDetail   []OfficeDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-    AddressDetail  []AddressDetail `gorm:"foreignKey:ID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-    CreatedAt      time.Time      
-    UpdatedAt      time.Time     
-    DeletedAt       time.Time 
-
-    
+    OfficeDetail   []OfficeDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+    AddressDetail  []AddressDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`  
 }

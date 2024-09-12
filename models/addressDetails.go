@@ -1,7 +1,6 @@
 package models
 
 import (
-	"time"
 	"gorm.io/gorm"
 )
 
@@ -14,6 +13,5 @@ type AddressDetail struct {
     Country      string
     ContactNo1   string
     ContactNo2   string
-    UpdatedAt    time.Time  
-    UserID       uint    `gorm:"index"`    
+    UserID       uint            `gorm:"index"`    
 }

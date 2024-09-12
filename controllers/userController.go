@@ -81,14 +81,14 @@ func Userlist(c *gin.Context){
     }
 
 	// var response []datatoSend
-    for _, i := range user {
-		if i.IsActive {
-			response = append(response, datatoSend{
-				UserID: i.ID,
-				Email:  i.Email,
-			})
-		}
-    }
+    // for _, i := range user {
+	// 	if i.IsActive {
+	// 		response = append(response, datatoSend{
+	// 			UserID: i.ID,
+	// 			Email:  i.Email,
+	// 		})
+	// 	}
+    // }
 
     c.JSON(http.StatusOK, response)
 
