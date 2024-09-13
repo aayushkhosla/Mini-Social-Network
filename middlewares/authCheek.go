@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	// "github.com/aayushkhosla/Mini-Social-Network/controllers"
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
 

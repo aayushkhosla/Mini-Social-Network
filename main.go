@@ -51,18 +51,27 @@ func main() {
 			"status": "ok",
 		})
 	})
-	r.POST("/auth/signup", controllers.SignUp)
-	r.POST("/auth/login", controllers.Login)  
 
-
-
-	r.GET("/user/personaldetails" , middlewares.CheckAuth , controllers.Getuser )
-	r.GET("/user/getalluser" , middlewares.CheckAuth , controllers.Userlist )
-	r.GET("/user/follows/:id" , middlewares.CheckAuth , controllers.Follow )
-	r.GET("/user/unfollows/:id" , middlewares.CheckAuth , controllers.Unfollow)
-	r.POST("/user/UpdatePassword" , middlewares.CheckAuth , controllers.UpdatePassword)
-	r.DELETE("user/DeleteUser" , middlewares.CheckAuth , controllers.Deleteuser)
+		//Grouping routes
+	auth := r.Group("/auth")
+	{
+		auth.POST("/signup", controllers.SignUp)
+		auth.POST("/login", controllers.Login)
+		
+	}
+	user := r.Group("/user")
+	{
+		user.GET("/getalluser" , middlewares.CheckAuth , controllers.Userlist )
+		user.GET("/getuser" , middlewares.CheckAuth , controllers.Getuser )
+		user.GET("/follows/:id" , middlewares.CheckAuth , controllers.Follow )
+		user.GET("/unfollows/:id" , middlewares.CheckAuth , controllers.Unfollow)
+		user.POST("/updatePassword" , middlewares.CheckAuth , controllers.UpdatePassword)
+		user.DELETE("/deleteUser" , middlewares.CheckAuth , controllers.Deleteuser)
+		user.GET("/getfollowinglist" , middlewares.CheckAuth ,controllers.FollowingList)
+		user.GET("/getfollowslist" , middlewares.CheckAuth ,controllers.FollowersList)
 	
+	}
+
 
 
 	r.Run(":8089")

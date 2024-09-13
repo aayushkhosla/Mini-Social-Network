@@ -1,9 +1,10 @@
 package controllers
 
 import (
-
+	// "fmt"
 	"fmt"
 	"net/http"
+	"time"
 
 	// "os/user"
 	"strconv"
@@ -12,10 +13,53 @@ import (
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
-
+var validate = validator.New()
 func updateUser(c *gin.Context){
+	userID, _ := c.Get("currentUserid")
+	UserID := userID.(uint)
+	 var input struct {
+		FirstName      string            `validate:"required,min=2,max=50"`
+		LastName       string            `validate:"required,min=2,max=50"`
+		DateOfBirth    time.Time         `validate:"required"`
+		Gender         models.Gender     `validate:"required,gendercheek"`
+		MaritalStatus  models.MaritalStatus `validate:"required,maritalstatuscheek"`
+		
+	 }
+	 if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	validate.RegisterValidation("gendercheek" , gendervalidation)
+	validate.RegisterValidation("maritalstatuscheek" , maritalStatusvalidation)
 
+	
+	if err := validate.Struct(input); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		errorMessages := make(map[string]string)
+		for _, err := range validationErrors {
+			errorMessages[err.Field()] = fmt.Sprintf("The field %s is %s", err.Field(), err.Tag())
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"errors": errorMessages})
+		return
+	}
+	var userFound models.User	
+	database.GORM_DB.First(&userFound , "ID=?" , UserID).Find(&userFound)
+	
+	userFound.FirstName = input.FirstName
+	userFound.LastName = input.LastName
+	userFound.DateOfBirth  =input.DateOfBirth
+	userFound.Gender = input.Gender
+	userFound.MaritalStatus = input.MaritalStatus
+	if err := database.GORM_DB.Save(&userFound).Error ; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
+		return
+	}
+	c.JSON(http.StatusOK  ,gin.H{
+
+	})
+	
 }
 
 
@@ -32,7 +76,7 @@ func Getuser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
 		return
 	}
-
+	user.Password = "";
 	c.JSON(http.StatusOK, user)
 }
 
@@ -65,37 +109,71 @@ func Userlist(c *gin.Context){
 		UserID       uint  
 		Email    string 
 	}
-	currentUser , exists := c.Get("currentUser")
-	if !exists{
-		c.JSON(http.StatusUnauthorized , gin.H{
-			"error":"Unauthorized",
-		})
-	}
 
-	var response []datatoSend
-	fmt.Println(currentUser)
 	var user []models.User
 	if err := database.GORM_DB.Find(&user).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch users"})
         return
     }
-
-	// var response []datatoSend
-    // for _, i := range user {
-	// 	if i.IsActive {
-	// 		response = append(response, datatoSend{
-	// 			UserID: i.ID,
-	// 			Email:  i.Email,
-	// 		})
-	// 	}
-    // }
+	currentUserid, _ := c.Get("currentUserid")
+	currId := currentUserid.(uint)
+	var response []datatoSend
+    for _, i := range user {
+		if currId != i.ID{
+			response = append(response, datatoSend{
+				UserID: i.ID,
+				Email:  i.Email,
+			})
+		}
+    }
 
     c.JSON(http.StatusOK, response)
 
 }
 
-func FollowList(c *gin.Context){
-	
+func FollowingList(c *gin.Context){
+	currentUserid, _ := c.Get("currentUserid")
+	currId := currentUserid.(uint)
+
+	var followList []models.User
+	err := database.GORM_DB.
+    Table("follows").
+    Select("users.*").
+    Joins("JOIN users ON users.id = follows.followed_user_id").
+    Where("follows.user_id = ? AND follows.active = ?", currId, true).
+    Find(&followList).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,gin.H{
+			"error":"Error retrieving follow list",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"list":followList,
+	})
+
+}
+
+func FollowersList(c *gin.Context){
+	currentUserid, _ := c.Get("currentUserid")
+	currId := currentUserid.(uint)
+
+	var followList []models.User
+	err := database.GORM_DB.
+    Table("follows").
+    Select("users.*").
+    Joins("JOIN users ON users.id = follows.user_id").
+    Where("follows.followed_user_id = ? AND follows.active = ?", currId, true).
+    Find(&followList).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,gin.H{
+			"error":"Error retrieving follow list",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"list":followList,
+	})
 
 }
 
