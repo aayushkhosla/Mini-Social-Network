@@ -12,6 +12,7 @@ import (
 	// "gorm.io/gorm"
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
+	"github.com/aayushkhosla/Mini-Social-Network/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -32,8 +33,8 @@ func UpdateUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	validate.RegisterValidation("gendercheek" , gendervalidation)
-	validate.RegisterValidation("maritalstatuscheek" , maritalStatusvalidation)
+	validate.RegisterValidation("gendercheek" , validation.Gendervalidation)
+	validate.RegisterValidation("maritalstatuscheek" , validation.MaritalStatusvalidation)
 
 	
 	if err := validate.Struct(input); err != nil {
@@ -64,8 +65,6 @@ func UpdateUser(c *gin.Context){
 	
 }
 
-
-
 func Getuser(c *gin.Context) {
 	userID, exists := c.Get("currentUserid")
 	if !exists {
@@ -81,7 +80,6 @@ func Getuser(c *gin.Context) {
 	user.Password = "";
 	c.JSON(http.StatusOK, user)
 }
-
 
 func Deleteuser(c *gin.Context){
 	currentUser, exists := c.Get("currentUser")
@@ -102,8 +100,6 @@ func Deleteuser(c *gin.Context){
 		"message": "User deleted successfully",
 	})
 }
-
-
 
 func Userlist(c *gin.Context){
 
