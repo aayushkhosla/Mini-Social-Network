@@ -28,6 +28,6 @@ type User struct {
     DateOfBirth    time.Time   `gorm:"type:date"`
     Gender         Gender
     MaritalStatus  MaritalStatus
-        OfficeDetail   []OfficeDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `
-        AddressDetail  []AddressDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `  
+    OfficeDetail   []OfficeDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `
+    AddressDetail  []AddressDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `  
 }

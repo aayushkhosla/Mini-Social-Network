@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -12,23 +13,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/itsjamie/gin-cors"
 	"github.com/joho/godotenv"
-
 )
 
 func init() {
+	err1 := godotenv.Load(".env")
+	if err1 != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	
 	err := database.ConnectToDatabase()
 	if err != nil {
 		panic(err)
 	} else {
 		fmt.Println("Connetion to database .. ")
 	}
-	godotenv.Load()
-	// if err := goose.SetDialect("postgres"); err != nil {
-    //     panic(err)
-    // }
-    // if err := goose.Up(database.SQL_DB, "migrations"); err != nil {
-    //     panic(err)
-    // }
+	
 }
 
 func main() {
@@ -69,7 +68,7 @@ func main() {
 		user.DELETE("/deleteUser" , middlewares.CheckAuth , controllers.Deleteuser)
 		user.GET("/getfollowinglist" , middlewares.CheckAuth ,controllers.FollowingList)
 		user.GET("/getfollowslist" , middlewares.CheckAuth ,controllers.FollowersList)
-		user.PATCH("updateUser",middlewares.CheckAuth,controllers.UpdateUser)
+		user.PATCH("/updateUser",middlewares.CheckAuth,controllers.UpdateUser)
 	}
 
 

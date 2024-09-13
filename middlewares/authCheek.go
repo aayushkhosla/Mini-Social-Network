@@ -8,7 +8,6 @@ import (
 	"time"
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -57,10 +56,7 @@ func CheckAuth(c *gin.Context) {
 	}
 
 	var user models.User
-	// database.GORM_DB.Where("ID=?", claims["id"]).Find(&user)
 	database.GORM_DB.First(  &user , "ID=?", claims["id"] ).Find(&user)
-
-
 	if user.ID == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

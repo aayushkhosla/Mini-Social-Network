@@ -3,8 +3,6 @@ package migrations
 import (
 	"context"
 	"database/sql"
-
-	// "github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
 	"github.com/pressly/goose/v3"
 	"gorm.io/driver/postgres"
@@ -16,7 +14,6 @@ func init() {
 }
 
 func upFollowes(ctx context.Context, tx *sql.Tx) error {
-	// This code is executed when the migration is applied.
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		Conn: tx,
 	}), &gorm.Config{})
