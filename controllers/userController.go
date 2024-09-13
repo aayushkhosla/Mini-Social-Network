@@ -16,7 +16,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 var validate = validator.New()
-func updateUser(c *gin.Context){
+
+func UpdateUser(c *gin.Context){
 	userID, _ := c.Get("currentUserid")
 	UserID := userID.(uint)
 	 var input struct {
@@ -45,8 +46,11 @@ func updateUser(c *gin.Context){
 		return
 	}
 	var userFound models.User	
-	database.GORM_DB.First(&userFound , "ID=?" , UserID).Find(&userFound)
-	
+
+	if err := database.GORM_DB.Preload("AddressDetail").Preload("OfficeDetail").Where("id = ?", UserID).First(&userFound).Error; err != nil {	
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
+		return
+	}
 	userFound.FirstName = input.FirstName
 	userFound.LastName = input.LastName
 	userFound.DateOfBirth  =input.DateOfBirth
@@ -56,9 +60,7 @@ func updateUser(c *gin.Context){
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong"})
 		return
 	}
-	c.JSON(http.StatusOK  ,gin.H{
-
-	})
+	c.JSON(http.StatusOK  , userFound)
 	
 }
 

@@ -69,7 +69,7 @@ func main() {
 		user.DELETE("/deleteUser" , middlewares.CheckAuth , controllers.Deleteuser)
 		user.GET("/getfollowinglist" , middlewares.CheckAuth ,controllers.FollowingList)
 		user.GET("/getfollowslist" , middlewares.CheckAuth ,controllers.FollowersList)
-	
+		user.PATCH("updateUser",middlewares.CheckAuth,controllers.UpdateUser)
 	}
 
 
