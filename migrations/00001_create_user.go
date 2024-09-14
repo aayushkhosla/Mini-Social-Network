@@ -3,7 +3,6 @@ package migrations
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
 	"github.com/pressly/goose/v3"
 	"gorm.io/driver/postgres"
@@ -33,7 +32,6 @@ func downCreateUser(ctx context.Context, tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Test ", db)
 	return db.Migrator().DropTable(&models.User{})
 }
 

@@ -70,9 +70,6 @@ func main() {
 		user.GET("/getfollowslist" , middlewares.CheckAuth ,controllers.FollowersList)
 		user.PATCH("/updateUser",middlewares.CheckAuth,controllers.UpdateUser)
 	}
-
-
-
 	r.Run(":8089")
 
 }

@@ -7,7 +7,7 @@ import (
 
 
 type Signupinput struct {
-	Password       string            `validate:"required,min=6,max=50"`
+	Password       string            `validate:"required,min=6,max=50,passcheek"`
 	Email          string            `validate:"required,email"`
 	FirstName      string            `validate:"required,min=2,max=50"`
 	LastName       string            `validate:"required,min=2,max=50"`
@@ -27,7 +27,7 @@ type Signupinput struct {
 	State          string            `validate:"required,max=50"`
 	Country        string            `validate:"required,max=50"`
 	ContactNo1     string            `validate:"required,min=10,max=15"`
-	ContactNo2     string            `validate:"required,min=10,max=15"`
+	ContactNo2     string            
 }
 
 type LoginInput struct {

@@ -40,7 +40,7 @@ func SignUp(c *gin.Context ){
 				return
 			}
 		
-			validate.RegisterValidation("passcheck", validation.StrongPassword )
+			validate.RegisterValidation("passcheek", validation.StrongPassword )
 			validate.RegisterValidation("gendercheek" , validation.Gendervalidation)
 			validate.RegisterValidation("maritalstatuscheek" , validation.MaritalStatusvalidation)
 	
