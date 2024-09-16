@@ -78,6 +78,11 @@ func Deleteuser(c *gin.Context , Currentuser models.User){
 		})
 	
 	}
+	if err := database.GORM_DB.Where("user_id = ? OR followed_user_id = ?" ,Currentuser.ID ,Currentuser.ID ).Delete(&models.Follow{}).Error ; err != nil {
+		c.JSON(http.StatusInternalServerError , gin.H{
+			"error":"Internal Server Error",
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User deleted successfully",
 	})

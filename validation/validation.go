@@ -10,6 +10,8 @@ func StrongPassword(fl validator.FieldLevel) bool {
     re := regexp.MustCompile(`(.*[a-z]+)(.*[A-Z]+)(.*[0-9]+)(.*[!@#$%]+)`) 
     return re.MatchString(password)
 }
+
+
 func Gendervalidation(fl validator.FieldLevel) bool{
 	input := fl.Field().String()
 	switch input {

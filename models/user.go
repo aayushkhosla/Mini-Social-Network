@@ -20,14 +20,14 @@ const (
 
 type User struct {
     gorm.Model
-    ID             uint           `gorm:"primaryKey"`
-    Password       string         `gorm:"not null" json:"-"`
-    Email          string         `gorm:"unique;not null"`
-    FirstName      string
-    LastName       string
-    DateOfBirth    time.Time   `gorm:"type:date"`
-    Gender         Gender
-    MaritalStatus  MaritalStatus
-    OfficeDetail   []OfficeDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `
-    AddressDetail  []AddressDetail `gorm:"foreignKey:UserID"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" `  
+    ID             uint            `gorm:"primaryKey"`
+    Password       string          `gorm:"not null;json:-"`
+    Email          string          `gorm:"unique;not null"`
+    FirstName      string          `gorm:"not null"`
+    LastName       string       
+    DateOfBirth    time.Time       `gorm:"type:date;not null"`
+    Gender         Gender          `gorm:"not null"`
+    MaritalStatus  MaritalStatus   `gorm:"not null"`
+    OfficeDetail   []OfficeDetail  `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" `
+    AddressDetail  []AddressDetail `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" `  
 }

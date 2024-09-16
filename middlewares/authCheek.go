@@ -49,7 +49,11 @@ func CheckAuth(c *gin.Context) {
 		return
 	}
 	var user models.User
-	database.GORM_DB.First(  &user , "ID=?", claims["id"] ).Find(&user)
+	if err:= database.GORM_DB.First(&user , "ID=?", claims["id"] ).Error; err!= nil{
+		c.JSON(http.StatusBadRequest ,gin.H{
+			"error" : "User not found",
+		})
+	}
 	if user.ID == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return

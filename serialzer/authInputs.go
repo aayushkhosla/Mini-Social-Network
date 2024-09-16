@@ -32,11 +32,11 @@ type Signupinput struct {
 
 type LoginInput struct {
 	Email    string `validate:"required,email"`
-	Password string `validate:"required"`
+	Password string `validate:"required,passcheek"`
 }
 
 
 type UpdatePassword struct{
-	Oldpassword string `validate:"required"`
-	Newpassword string  `validate:"required"`
+	Oldpassword string `validate:"required,passcheek"`
+	Newpassword string  `validate:"required,passcheek"`
 }

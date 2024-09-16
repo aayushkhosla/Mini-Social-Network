@@ -11,7 +11,6 @@ import (
 
 )
 
-
 func Login(c *gin.Context) {
 
 	var loginInput serialzer.LoginInput
@@ -19,6 +18,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read request body"})
 		return
 	}
+	validate.RegisterValidation("passcheek", validation.StrongPassword )
 	if err := validate.Struct(loginInput); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
 		errorMessages := make(map[string]string)
@@ -53,6 +53,7 @@ func SignUp(c *gin.Context ){
 				c.JSON(http.StatusBadRequest, gin.H{"errors": errorMessages})
 				return
 			}
+			fmt.Println(input.DateOfBirth)
 
 			services.SignUp(c,input)
 

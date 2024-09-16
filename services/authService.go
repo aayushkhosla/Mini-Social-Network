@@ -5,19 +5,21 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
 	"github.com/aayushkhosla/Mini-Social-Network/database"
 	"github.com/aayushkhosla/Mini-Social-Network/models"
 	"github.com/aayushkhosla/Mini-Social-Network/serialzer"
+	
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
 func SignUp(c *gin.Context , input serialzer.Signupinput){
 	var userFound models.User
 			
-	database.GORM_DB.First(&userFound , "email=?" ,input.Email).Find(&userFound)
+	database.GORM_DB.First(&userFound , "email=?" ,input.Email)
+
 	if userFound.ID != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already used"})
 		return
@@ -30,7 +32,8 @@ func SignUp(c *gin.Context , input serialzer.Signupinput){
 
 	user := models.User{
 		Password :string(passwordHash),   
-		Email :input.Email  ,         
+		Email :input.Email  ,
+		DateOfBirth: input.DateOfBirth,         
 		FirstName    :input.FirstName,
 		LastName       :input.LastName,
 		Gender       :input.Gender,
@@ -58,7 +61,10 @@ func SignUp(c *gin.Context , input serialzer.Signupinput){
 	}
 	user.AddressDetail = append(user.AddressDetail , adderss)
 	user.OfficeDetail = append(user.OfficeDetail, office)
-	database.GORM_DB.Create(&user)
+	if err := database.GORM_DB.Create(&user).Error ; err!= nil {
+		c.JSON(http.StatusBadRequest , gin.H{"error" : "Email already used"})
+		return
+	}
 
 
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -81,7 +87,7 @@ func SignUp(c *gin.Context , input serialzer.Signupinput){
 		"last_modified": user.UpdatedAt.Format(time.RFC3339),
 		"gender":        user.Gender,
 		"marital_status": user.MaritalStatus,
-		"date_of_birth": user.DateOfBirth.Format("2006-01-02"),
+		"date_of_birth": user.DateOfBirth, 	
 		"AddressDetail": gin.H{
 				"user_id":     user.ID,
 				"address":     adderss.Address,
@@ -116,7 +122,7 @@ func SignUp(c *gin.Context , input serialzer.Signupinput){
 func Login(c *gin.Context , loginInput serialzer.LoginInput){
 	var userFound models.User
 	if err := database.GORM_DB.First(&userFound, "email = ?", loginInput.Email).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password."})
 		return
 	}
 
@@ -134,9 +140,20 @@ func Login(c *gin.Context , loginInput serialzer.LoginInput){
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
+	}
+	Response := gin.H{
+		"token":gin.H{
+			"key" : token,
+			"expiry time" : time.Now().Add(time.Hour * 4).Unix(),
+		},
+		"user" :gin.H{
+			"id":userFound.ID,
+			"email" :userFound.Email,
+			"first_name" : userFound.FirstName,
+			"last_name" : userFound.LastName,
+			"last_modified" : userFound.UpdatedAt,
+		},
 	}	
-
-	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-	})
+		
+	c.JSON(http.StatusOK,Response )
 }
